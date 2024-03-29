@@ -1,0 +1,105 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+deg_dir <- './DEG_RNA-seq_ALL/'
+```
+
+```{r, eval=TRUE}
+GOI <- c('cut6', 'lcf1', 'lcf2', 'ole1', 'fsh2', 'vht1', 'bio2', 'fas1', 'fas2', 'ptl1', 'ptl2')
+
+rna_seq_cbf11 <- read.csv(paste0(deg_dir, 'DESeq2results_cbf11-YES_vs_WT-YES.RUVSeq-norm.csv'), row.names = 1)
+rna_seq_cbf11dbm <- read.csv(paste0(deg_dir, 'DESeq2results_cbf11DBM-YES_vs_WT-YES.RUVSeq-norm.csv'), row.names = 1)
+rna_seq_mga2 <- read.csv(paste0(deg_dir, 'DESeq2results_mga2-YES_vs_WT-YES.RUVSeq-norm.csv'), row.names = 1)
+rna_seq_mga2cbf11 <- read.csv(paste0(deg_dir, 'DESeq2results_mga2cbf11-YES_vs_WT-YES.RUVSeq-norm.csv'), row.names = 1)
+rna_seq_cut6 <- read.csv(paste0(deg_dir, 'DESeq2results_Pcut6MUT-YES_vs_WT-YES.RUVSeq-norm.csv'), row.names = 1)
+rna_seq_cer <- read.csv(paste0(deg_dir, 'DESeq2results_WT-YES+cerulenin_vs_WT-YES+DMSO.RUVSeq-norm.csv'), row.names = 1)
+rna_seq_cbf11_amm <- read.csv(paste0(deg_dir, 'DESeq2results_cbf11-YES+AMM_vs_WT-YES+AMM.RUVSeq-norm.csv'), row.names = 1)
+rna_seq_cbf11dbm_amm <- read.csv(paste0(deg_dir, 'DESeq2results_cbf11DBM-YES+AMM_vs_WT-YES+AMM.RUVSeq-norm.csv'), row.names = 1)
+rna_seq_mga2_amm <- read.csv(paste0(deg_dir, 'DESeq2results_mga2-YES+AMM_vs_WT-YES+AMM.RUVSeq-norm.csv'), row.names = 1)
+rna_seq_mga2cbf11_amm <- read.csv(paste0(deg_dir, 'DESeq2results_mga2cbf11-YES+AMM_vs_WT-YES+AMM.RUVSeq-norm.csv'), row.names = 1)
+
+
+rna_seq_cbf11 <- rna_seq_cbf11[rna_seq_cbf11$gene_name %in% GOI, ]
+rna_seq_cbf11dbm <- rna_seq_cbf11dbm[rna_seq_cbf11dbm$gene_name %in% GOI, ]
+rna_seq_mga2 <- rna_seq_mga2[rna_seq_mga2$gene_name %in% GOI, ]
+rna_seq_mga2cbf11 <- rna_seq_mga2cbf11[rna_seq_mga2cbf11$gene_name %in% GOI, ]
+rna_seq_cut6 <- rna_seq_cut6[rna_seq_cut6$gene_name %in% GOI, ]
+rna_seq_cer <- rna_seq_cer[rna_seq_cer$gene_name %in% GOI, ]
+rna_seq_cbf11_amm <- rna_seq_cbf11_amm[rna_seq_cbf11_amm$gene_name %in% GOI, ]
+rna_seq_cbf11dbm_amm <- rna_seq_cbf11dbm_amm[rna_seq_cbf11dbm_amm$gene_name %in% GOI, ]
+rna_seq_mga2_amm <- rna_seq_mga2_amm[rna_seq_mga2_amm$gene_name %in% GOI, ]
+rna_seq_mga2cbf11_amm <- rna_seq_mga2cbf11_amm[rna_seq_mga2cbf11_amm$gene_name %in% GOI, ]
+
+
+rna_seq_data <- data.frame(gene_name = rna_seq_cbf11$gene_name,
+               cbf11 = rna_seq_cbf11$log2FoldChange,
+               cbf11_amm = rna_seq_cbf11_amm$log2FoldChange,
+               cbf11dbm = rna_seq_cbf11dbm$log2FoldChange,
+               cbf11dbm_amm = rna_seq_cbf11dbm_amm$log2FoldChange,
+               mga2 = rna_seq_mga2$log2FoldChange,
+               mga2_amm = rna_seq_mga2_amm$log2FoldChange,
+               mga2cbf11 = rna_seq_mga2cbf11$log2FoldChange,
+               mga2cbf11_amm = rna_seq_mga2cbf11_amm$log2FoldChange,
+               Pcut6MUT = rna_seq_cut6$log2FoldChange,
+               cer = rna_seq_cer$log2FoldChange)
+
+rna_seq_data <- rna_seq_data[match(GOI, rna_seq_data$gene_name),]
+```
+
+```{r, eval=TRUE}
+
+rna_seq_data_linear <- data.frame(gene_name = rna_seq_cbf11$gene_name,
+               cbf11 = 2^rna_seq_cbf11$log2FoldChange,
+               cbf11dbm = 2^rna_seq_cbf11dbm$log2FoldChange,
+               mga2 = 2^rna_seq_mga2$log2FoldChange,
+               mga2cbf11 = 2^rna_seq_mga2cbf11$log2FoldChange,
+               Pcut6MUT = 2^rna_seq_cut6$log2FoldChange,
+               cer = 2^rna_seq_cer$log2FoldChange,
+               cbf11_amm = 2^rna_seq_cbf11_amm$log2FoldChange,
+               cbf11dbm_amm = 2^rna_seq_cbf11dbm_amm$log2FoldChange,
+               mga2_amm = 2^rna_seq_mga2_amm$log2FoldChange,
+               mga2cbf11_amm = 2^rna_seq_mga2cbf11_amm$log2FoldChange)
+
+# relative gene expression as compared to WT (linearized DESeq2 output)
+rna_seq_data
+write.csv(rna_seq_data, 'rna_seq_data', quote = FALSE, row.names = FALSE)
+
+rna_seq_data_linear
+write.csv(rna_seq_data_linear, 'rna_seq_data_linear', quote = FALSE, row.names = FALSE)
+
+barplot(as.matrix(rna_seq_data_linear[, 2:11]),
+        beside = TRUE,
+        names.arg = c('cbf11KO', 'cbf11DBM', 'mga2KO', 'cbf11KOmga2KO', 'Pcut6MUT', 'cerulenin', 'cbf11KO_AMM', 'cbf11DBM_AMM', 'mga2KO_AMM', 'cbf11KOmga2KO_AMM'),
+        legend.text = rna_seq_data_linear$gene_name,
+        args.legend = list(x = 'top', ncol = 5),
+        ylim = c(0, 1.5))
+```
+
+!! But maybe it will be best visualized as a small heatmap.
+
+```{r}
+library(gplots)
+
+heatmap.2(as.matrix(rna_seq_data[, 2:11]),
+          dendrogram = 'none',
+          Rowv = FALSE,
+          Colv = FALSE,
+          colsep = c(2, 4, 6, 8),
+          trace = 'none',
+          labRow = rna_seq_data[, 1],
+          density.info = 'none',
+          symbreaks = TRUE,
+          scale = 'none',
+          key = TRUE,
+          keysize = 1.5,
+          col = colorRampPalette(c("blue", 'black', 'yellow'))(20),
+          margins = c(9, 4),
+          cexRow = 0.8,
+          cexCol = 0.8,
+          lwid = c(12, 6))
+```
